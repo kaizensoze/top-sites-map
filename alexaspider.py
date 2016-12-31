@@ -5,31 +5,36 @@ import subprocess
 class AlexaTopGlobalSpider(scrapy.Spider):
     name = 'alexatopglobalspider'
     start_urls = ['http://www.alexa.com/topsites']
+    hosts = []
     
     def parse(self, response):
-        hosts = []
         for site_listing in response.css('li.site-listing'):
             host = site_listing.css('p.desc-paragraph a ::text').extract_first()
-            hosts.append(host)
+            self.hosts.append(host)
         
-        host_to_ip = {}
-        ip_to_latlng = {}
-        for host in hosts:
-            ip = subprocess.check_output("ping -c 1 %s | grep '64 bytes from ' | awk '{print $4}' | cut -d ':' -f1" % host, shell=True)
-            host_to_ip[host] = ip.strip()
+        next_page = response.css('a.next ::attr(href)').extract_first()
+        if next_page:
+            yield scrapy.Request(response.urljoin(next_page), callback=self.parse)
+        else:
+            self.export()
+    
+    def export(self):
+        data = []
+        for i, host in enumerate(self.hosts):
+            print(i, host)
             
-            json_text = subprocess.check_output("curl ipinfo.io/%s" % ip, shell=True)
-            latlng_json = json.loads(json_text)
-            latlng = latlng_json['loc']
-            ip_to_latlng[ip] = latlng.strip()
+            ip = subprocess.check_output("ping -c 1 %s | grep '64 bytes from ' | awk '{print $4}' | cut -d ':' -f1" % host, shell=True).strip()
+            
+            latlng_output = subprocess.check_output("curl ipinfo.io/%s" % ip, shell=True)
+            latlng_json = json.loads(latlng_output)
+            latlng = latlng_json['loc'].strip()
+            
+            data.append({
+                'host': host,
+                'ip': ip,
+                'loc': latlng
+            })
         
-        # write to json
         with open('data.json', 'w') as outfile:
-            out = []
-            for host in hosts:
-                out.append({
-                    'host': host,
-                    'ip': host_to_ip[host],
-                    'loc': ip_to_latlng[ip]
-                })
-            json.dump(out, outfile)
+            json.dump(data, outfile)
+    
