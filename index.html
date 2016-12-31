@@ -36,6 +36,11 @@
         });
         
         $.each(data, function(i, val) {
+          // skip if missing ip address
+          if (val['ip'] === '') {
+            return true;
+          }
+          
           var host = val['host'];
           var latlngParts = val['loc'].split(',');
           var lat = latlngParts[0];
