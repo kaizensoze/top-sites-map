@@ -16,9 +16,24 @@ class AlexaTopGlobalSpider(scrapy.Spider):
         if next_page:
             yield scrapy.Request(response.urljoin(next_page), callback=self.parse)
         else:
-            self.export()
+            lookup(self.hosts)
+
+def lookup(hosts):
+    data = []
+    for i, host in enumerate(hosts):
+        print(i, host)
+        
+        ip = subprocess.check_output("nslookup %s | grep 'Address' | sed -n 2p | awk '{print $2}'" % host, shell=True).strip()
     
-    def export(self):
-        with open('tophosts.txt', 'w') as f:
-            f.write('\n'.join(self.hosts))
-        f.close()
+        latlng_output = subprocess.check_output("curl ipinfo.io/%s" % ip, shell=True)
+        latlng_json = json.loads(latlng_output)
+        latlng = latlng_json['loc'].strip()
+    
+        data.append({
+            'host': host,
+            'ip': ip,
+            'loc': latlng
+        })
+    
+    with open('data.json', 'w') as outfile:
+        json.dump(data, outfile)
