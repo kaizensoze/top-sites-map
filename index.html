@@ -28,6 +28,15 @@
           zoom: 2
         });
       }
+      
+      $.getJSON("data.json", function(json) {
+        console.log(json);
+        // var latLng = new google.maps.LatLng(coords[1], coords[0]);
+        // var marker = new google.maps.Marker({
+        //   position: latLng,
+        //   map: map
+        // });
+      });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOD06Tqv5OI7UVzhEmN21FrLSmoQro3Y4&callback=initMap"
     async defer></script>
