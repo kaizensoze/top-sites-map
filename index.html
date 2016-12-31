@@ -20,6 +20,7 @@
   </head>
   <body>
     <div id="map"></div>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <script>
       var map;
       function initMap() {
@@ -29,13 +30,29 @@
         });
       }
       
-      $.getJSON("data.json", function(json) {
-        console.log(json);
-        // var latLng = new google.maps.LatLng(coords[1], coords[0]);
-        // var marker = new google.maps.Marker({
-        //   position: latLng,
-        //   map: map
-        // });
+      $.getJSON("https://kaizensoze.github.io/top-sites-map/data.json", function(data) {
+        var infowindow = new google.maps.InfoWindow({
+          content: '<div>blah</div>'
+        });
+        
+        $.each(data, function(i, val) {
+          var host = val['host'];
+          var latlngParts = val['loc'].split(',');
+          var lat = latlngParts[0];
+          var lng = latlngParts[1];
+          var latLng = new google.maps.LatLng(lat, lng);
+          
+          var marker = new google.maps.Marker({
+            position: latLng,
+            title: host,
+            map: map
+          });
+          
+          marker.addListener('click', function() {
+            infowindow.setContent('<div>'+host+'</div>');
+            infowindow.open(map, marker);
+          });
+        });
       });
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOD06Tqv5OI7UVzhEmN21FrLSmoQro3Y4&callback=initMap"
