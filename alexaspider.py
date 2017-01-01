@@ -25,14 +25,18 @@ def lookup(hosts):
         
         ip = subprocess.check_output("nslookup %s | grep 'Address' | sed -n 2p | awk '{print $2}'" % host, shell=True).strip()
         
-        latlng_output = subprocess.check_output("curl -s ipinfo.io/%s" % ip, shell=True)
-        latlng_json = json.loads(latlng_output)
-        latlng = latlng_json['loc'].strip()
-        
-        address = subprocess.check_output("curl -s \"http://maps.googleapis.com/maps/api/geocode/json?latlng=%s&sensor=false\" | jq -r '.results[1] | .formatted_address'" % latlng, shell=True).strip()
+        if ip != "":
+            latlng_output = subprocess.check_output("curl -s ipinfo.io/%s" % ip, shell=True)
+            latlng_json = json.loads(latlng_output)
+            latlng = latlng_json['loc'].strip()
+            
+            address = subprocess.check_output("curl -s \"http://maps.googleapis.com/maps/api/geocode/json?latlng=%s&sensor=false\" | jq -r '.results[1] | .formatted_address'" % latlng, shell=True).strip()
+        else:
+            latlng = ""
+            address = ""
         
         data.append({
-            'rank': i,
+            'rank': i+1,
             'host': host,
             'ip': ip,
             'lat_lng': latlng,
