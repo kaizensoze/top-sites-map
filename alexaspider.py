@@ -1,6 +1,10 @@
 import json
 import scrapy
 import subprocess
+import sys  
+
+reload(sys)  
+sys.setdefaultencoding('utf8')
 
 class AlexaTopGlobalSpider(scrapy.Spider):
     name = 'alexatopglobalspider'
@@ -21,7 +25,7 @@ class AlexaTopGlobalSpider(scrapy.Spider):
 def lookup(hosts):
     data = []
     for i, host in enumerate(hosts):
-        print(i, host)
+        rank = i+1
         
         ip = subprocess.check_output("nslookup %s | grep 'Address' | sed -n 2p | awk '{print $2}'" % host, shell=True).strip()
         
@@ -36,12 +40,14 @@ def lookup(hosts):
             address = ""
         
         data.append({
-            'rank': i+1,
+            'rank': rank,
             'host': host,
             'ip': ip,
             'lat_lng': latlng,
             'address': address
         })
+        
+        print("| %s | %s | %s |" % (rank, host, address))
     
     with open('data.json', 'w') as outfile:
         json.dump(data, outfile, indent=2)
