@@ -1,0 +1,18 @@
+# place these in your ~/.zshenv
+
+host2ip() {
+  nslookup $1 | grep 'Address' | sed -n 2p | awk '{print $2}'
+}
+
+host2ip2() {
+  ping -c 1 $1 | grep "64 bytes from " | awk '{print $4}' | cut -d ":" -f1
+}
+
+geoiplookup2() {
+  curl -s ipinfo.io/$1
+}
+
+host2address() {
+  local LAT_LNG=$(geoiplookup2 `host2ip $1` | jq --raw-output '.loc')
+  curl -s "http://maps.googleapis.com/maps/api/geocode/json?latlng=$LAT_LNG&sensor=false" | jq -r '.results[1] | .formatted_address'
+}
