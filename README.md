@@ -1,5 +1,7 @@
 # top-sites-map
 
+NOTE: This was an actual map (see index.old.html) but there were too many markers at the exact same location (like Moscow) and I couldn't get marker clustering working at the appropriate zoom level.
+
 | Alexa Rank | Host | Location |
 |------------|------|----------|
 | 1 | Google.com | Ninnescah, KS, USA |
@@ -502,3 +504,10 @@
 | 498 | Momoshop.com.tw | Taipei, Keelung City, Taiwan |
 | 499 | Atlassian.net | Greenwood Village, CO, USA |
 | 500 | List-manage.com | 206 Washington St SW, Atlanta, GA 30334, USA |
+
+### Running scripts to update info
+```
+pip install scrapy
+scrapy runspider alexaspider.py
+./lookup.sh  # uses zsh function
+```
