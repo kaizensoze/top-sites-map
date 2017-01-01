@@ -28,39 +28,38 @@
           center: {lat: 0, lng: 0},
           zoom: 2
         });
-      }
-      
-      $.getJSON("https://kaizensoze.github.io/top-sites-map/data.json", function(data) {
-        var infowindow = new google.maps.InfoWindow({
-          content: '<div>blah</div>'
-        });
         
-        $.each(data, function(i, val) {
-          // skip if missing ip address
-          if (val['ip'] === '') {
-            return true;
-          }
-          
-          var host = val['host'];
-          var latlngParts = val['loc'].split(',');
-          var lat = latlngParts[0];
-          var lng = latlngParts[1];
-          var latLng = new google.maps.LatLng(lat, lng);
-          
-          var marker = new google.maps.Marker({
-            position: latLng,
-            title: host,
-            map: map
+        $.getJSON("https://kaizensoze.github.io/top-sites-map/data.json", function(data) {
+          var infowindow = new google.maps.InfoWindow({
+            content: '<div>blah</div>'
           });
           
-          marker.addListener('click', function() {
-            infowindow.setContent('<div>'+host+'</div>');
-            infowindow.open(map, marker);
+          $.each(data, function(i, val) {
+            // skip if missing ip address
+            if (val['ip'] === '') {
+              return true;
+            }
+            
+            var host = val['host'];
+            var latlngParts = val['loc'].split(',');
+            var lat = latlngParts[0];
+            var lng = latlngParts[1];
+            var latLng = new google.maps.LatLng(lat, lng);
+            
+            var marker = new google.maps.Marker({
+              position: latLng,
+              title: host,
+              map: map
+            });
+            
+            marker.addListener('click', function() {
+              infowindow.setContent('<div>'+host+'</div>');
+              infowindow.open(map, marker);
+            });
           });
         });
-      });
+      }
     </script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOD06Tqv5OI7UVzhEmN21FrLSmoQro3Y4&callback=initMap"
-    async defer></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBOD06Tqv5OI7UVzhEmN21FrLSmoQro3Y4&callback=initMap"></script>
   </body>
 </html>
